@@ -6,23 +6,23 @@ chromium.use(StealthPlugin());
 let browserInstance = null;
 
 export async function getBrowser() {
+  // Fresh browser per request — avoids Google tracking sessions across searches
   if (browserInstance && browserInstance.isConnected()) {
-    return browserInstance;
+    await browserInstance.close();
+    browserInstance = null;
   }
 
   browserInstance = await chromium.launch({
-    headless: true,
+    headless: false,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-blink-features=AutomationControlled',
       '--lang=en-US,en',
+      '--window-size=1280,800',
     ],
   });
-
-  process.on('exit', () => browserInstance?.close());
-  process.on('SIGINT', () => browserInstance?.close().then(() => process.exit(0)));
 
   return browserInstance;
 }
