@@ -1,0 +1,33 @@
+.favorites-panel {
+  padding: 1rem 0;
+}
+
+.favorites-panel h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.favorites-panel.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #718096;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.favorite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.saved-date {
+  font-size: 0.8rem;
+  color: #a0aec0;
+}
