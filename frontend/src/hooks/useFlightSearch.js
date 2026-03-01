@@ -19,6 +19,9 @@ export function useFlightSearch() {
         origin: data.origin,
         destination: data.destination,
         date: data.date,
+        returnDate: data.returnDate,
+        tripType: data.tripType,
+        cabin: data.cabin,
         count: data.count,
       });
     } catch (err) {

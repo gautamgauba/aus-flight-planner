@@ -25,7 +25,7 @@ export default function App() {
   });
 
   const handleSearch = (formValues) => {
-    search({ destination: formValues.destination, date: formValues.date });
+    search(formValues);
   };
 
   return (
@@ -60,8 +60,11 @@ export default function App() {
 
           {searchMeta && !loading && (
             <p className="results-meta">
-              Showing {filteredFlights.length} of {searchMeta.count} flights
-              from {searchMeta.origin} to {searchMeta.destination} on {searchMeta.date}
+              Showing {filteredFlights.length} of {searchMeta.count}{' '}
+              {searchMeta.cabin !== 'economy' ? searchMeta.cabin.replace('_', ' ') + ' ' : ''}
+              {searchMeta.tripType === 'round-trip' ? 'round-trip' : 'one-way'} flights
+              · {searchMeta.origin} → {searchMeta.destination}
+              · {searchMeta.date}{searchMeta.returnDate ? ` – ${searchMeta.returnDate}` : ''}
             </p>
           )}
 

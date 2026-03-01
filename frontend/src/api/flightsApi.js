@@ -7,8 +7,11 @@ const api = axios.create({
   timeout: 90000, // Playwright scraping can take up to 60s
 });
 
-export async function searchFlights({ destination, date, maxPrice, stops }) {
+export async function searchFlights({ destination, date, tripType, returnDate, cabin, maxPrice, stops }) {
   const params = { destination, date };
+  if (tripType) params.tripType = tripType;
+  if (returnDate) params.returnDate = returnDate;
+  if (cabin && cabin !== 'economy') params.cabin = cabin;
   if (maxPrice) params.maxPrice = maxPrice;
   if (stops && stops !== 'any') params.stops = stops;
 
