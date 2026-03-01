@@ -3,17 +3,24 @@ import SearchForm from './components/SearchForm/SearchForm.jsx';
 import FilterPanel from './components/FilterPanel/FilterPanel.jsx';
 import FlightCard from './components/FlightCard/FlightCard.jsx';
 import FavoritesPanel from './components/FavoritesPanel/FavoritesPanel.jsx';
+import FareCalendar from './components/FareCalendar/FareCalendar.jsx';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner.jsx';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage.jsx';
 import { useFlightSearch } from './hooks/useFlightSearch.js';
 import { useFavorites } from './hooks/useFavorites.js';
 import './App.css';
 
+const TABS = [
+  { id: 'search', label: 'Search Flights' },
+  { id: 'calendar', label: 'Fare Calendar' },
+  { id: 'favorites', label: 'Saved Flights' },
+];
+
 export default function App() {
   const { flights, loading, error, searchMeta, search } = useFlightSearch();
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [filters, setFilters] = useState({ maxPrice: 2000, stops: 'any' });
-  const [showFavorites, setShowFavorites] = useState(false);
+  const [activeTab, setActiveTab] = useState('search');
 
   const filteredFlights = flights.filter(flight => {
     const priceOk = flight.price === null || flight.price <= filters.maxPrice;
@@ -24,8 +31,10 @@ export default function App() {
     return priceOk && stopsOk;
   });
 
-  const handleSearch = (formValues) => {
-    search(formValues);
+  // When user clicks a calendar day, switch to search tab and run search
+  const handleCalendarDateSelect = ({ destination, date, cabin, tripType }) => {
+    setActiveTab('search');
+    search({ destination, date, cabin, tripType });
   };
 
   return (
@@ -36,20 +45,36 @@ export default function App() {
             <h1>AUS Flight Finder</h1>
             <p className="subtitle">Flights from Austin, TX (AUS) to anywhere</p>
           </div>
-          <button
-            className="favorites-toggle"
-            onClick={() => setShowFavorites(v => !v)}
-          >
-            {showFavorites ? 'Back to Search' : `Saved Flights (${favorites.length})`}
-          </button>
         </div>
+        <nav className="app-tabs">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+              {tab.id === 'favorites' && favorites.length > 0 && (
+                <span className="tab-badge">{favorites.length}</span>
+              )}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      {showFavorites ? (
+      {activeTab === 'favorites' && (
         <FavoritesPanel favorites={favorites} onRemove={removeFavorite} />
-      ) : (
+      )}
+
+      {activeTab === 'calendar' && (
         <main className="app-main">
-          <SearchForm onSearch={handleSearch} loading={loading} />
+          <FareCalendar onSelectDate={handleCalendarDateSelect} />
+        </main>
+      )}
+
+      {activeTab === 'search' && (
+        <main className="app-main">
+          <SearchForm onSearch={search} loading={loading} />
 
           {loading && <LoadingSpinner message="Searching Google Flights... this may take up to 30 seconds." />}
           {error && <ErrorMessage message={error} />}
@@ -61,7 +86,7 @@ export default function App() {
           {searchMeta && !loading && (
             <p className="results-meta">
               Showing {filteredFlights.length} of {searchMeta.count}{' '}
-              {searchMeta.cabin !== 'economy' ? searchMeta.cabin.replace('_', ' ') + ' ' : ''}
+              {searchMeta.cabin && searchMeta.cabin !== 'economy' ? searchMeta.cabin.replace('_', ' ') + ' ' : ''}
               {searchMeta.tripType === 'round-trip' ? 'round-trip' : 'one-way'} flights
               · {searchMeta.origin} → {searchMeta.destination}
               · {searchMeta.date}{searchMeta.returnDate ? ` – ${searchMeta.returnDate}` : ''}

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import flightsRouter from './routes/flights.js';
+import fareCalendarRouter from './routes/fareCalendar.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,6 +29,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/flights', flightsRouter);
+app.use('/api/fare-calendar', fareCalendarRouter);
 
 app.use((err, req, res, next) => {
   console.error('[Server Error]', err.message);

@@ -1,0 +1,257 @@
+.fare-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Controls */
+.fare-calendar__controls {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.fc-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.fc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 140px;
+}
+
+.fc-field--sm { flex: 0 0 130px; min-width: 120px; }
+
+.fc-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fc-field input,
+.fc-field select {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  outline: none;
+  background: white;
+}
+
+.fc-field input:focus,
+.fc-field select:focus { border-color: #1a56db; }
+
+.fc-search-btn {
+  background: #1a56db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 40px;
+  align-self: flex-end;
+  transition: background 0.2s;
+}
+
+.fc-search-btn:hover:not(:disabled) { background: #1447c0; }
+.fc-search-btn:disabled { background: #a0aec0; cursor: not-allowed; }
+
+/* Grid wrap */
+.fare-calendar__grid-wrap {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.fc-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.fc-month-nav button {
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.fc-month-nav button:hover { background: #f0f4f8; border-color: #1a56db; color: #1a56db; }
+
+.fc-month-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+/* Day name headers */
+.fc-day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.fc-day-name {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a0aec0;
+  text-transform: uppercase;
+  padding: 0.25rem 0;
+}
+
+/* Calendar grid */
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.fc-cell {
+  border-radius: 8px;
+  padding: 0.4rem 0.3rem;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: #f7fafc;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.fc-cell--empty { background: transparent; border: none; }
+.fc-cell--past { opacity: 0.35; }
+
+.fc-cell--clickable {
+  cursor: pointer;
+}
+
+.fc-cell--clickable:hover {
+  border-color: #1a56db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 86, 219, 0.15);
+}
+
+/* Price color coding */
+.fc-cell.price-low { background: #c6f6d5; }
+.fc-cell.price-mid { background: #fefcbf; }
+.fc-cell.price-high { background: #fed7d7; }
+
+.fc-cell--best {
+  border-color: #1a56db !important;
+  box-shadow: 0 0 0 2px rgba(26, 86, 219, 0.2);
+}
+
+.fc-day-num {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+  align-self: flex-start;
+  line-height: 1;
+}
+
+.fc-price {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.fc-no-price {
+  font-size: 0.75rem;
+  color: #cbd5e0;
+}
+
+.fc-best-badge {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: #1a56db;
+  color: white;
+  border-radius: 3px;
+  padding: 1px 4px;
+  text-transform: uppercase;
+}
+
+/* Loading */
+.fc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 1rem;
+  color: #4a5568;
+  text-align: center;
+}
+
+.fc-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #1a56db;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.fc-error {
+  background: #fff5f5;
+  border: 1.5px solid #fc8181;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #c53030;
+  font-size: 0.9rem;
+}
+
+/* Legend */
+.fc-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+
+.legend-item {
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.legend-item.price-low { background: #c6f6d5; color: #22543d; }
+.legend-item.price-mid { background: #fefcbf; color: #744210; }
+.legend-item.price-high { background: #fed7d7; color: #742a2a; }
+
+.legend-summary {
+  margin-left: auto;
+  color: #4a5568;
+}

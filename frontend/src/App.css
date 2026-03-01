@@ -33,6 +33,46 @@ body {
   gap: 1rem;
 }
 
+.app-tabs {
+  max-width: 900px;
+  margin: 0.75rem auto 0;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tab-btn {
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+
+.tab-btn.active {
+  background: white;
+  color: #1a56db;
+  font-weight: 700;
+}
+
+.tab-badge {
+  background: #e53e3e;
+  color: white;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0 6px;
+  line-height: 1.5;
+}
+
 .app-header h1 {
   font-size: 1.75rem;
   font-weight: 700;
