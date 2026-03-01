@@ -21,8 +21,11 @@ export default function SearchForm({ onSearch, loading }) {
     e.preventDefault();
     if (!destination.trim() || !date) return;
     if (tripType === 'round-trip' && !returnDate) return;
+    const dest = destination.trim();
+    // Only uppercase IATA codes (2-4 letters, no spaces/commas)
+    const formattedDest = /^[a-zA-Z]{2,4}$/.test(dest) ? dest.toUpperCase() : dest;
     onSearch({
-      destination: destination.trim().toUpperCase(),
+      destination: formattedDest,
       date,
       tripType,
       returnDate: tripType === 'round-trip' ? returnDate : undefined,

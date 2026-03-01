@@ -11,7 +11,8 @@ export async function scrapeFlights(url) {
   // Parse destination and date from our URL
   const urlObj = new URL(url);
   const query = decodeURIComponent(urlObj.searchParams.get('q') || '');
-  const destination = query.match(/to (.+?) on \d{4}/)?.[1]?.trim() || '';
+  // Query may be "economy one way flights from AUS to Delhi, India on 2026-03-15 returning 2026-03-22"
+  const destination = query.match(/from \S+ to (.+?) on \d{4}/)?.[1]?.trim() || '';
   const rawDate = query.match(/on (\d{4}-\d{2}-\d{2})/)?.[1] || '';
   const date = rawDate ? formatDateForGoogle(rawDate) : '';
 
@@ -41,10 +42,10 @@ export async function scrapeFlights(url) {
     await page.route('**/analytics/**', route => route.abort());
     await page.route('**/gtag/**', route => route.abort());
 
-    // Strategy 1: Navigate directly to results URL (skip form interaction)
-    const directUrl = buildDirectFlightsUrl(destination, rawDate);
-    console.log('[Scraper] Navigating directly to:', directUrl.slice(0, 80));
-    await page.goto(directUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    // Strategy 1: Navigate directly to results URL using the pre-built URL
+    // (already contains cabin class and trip type from urlBuilder)
+    console.log('[Scraper] Navigating directly to:', url.slice(0, 80));
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await randomDelay(2000, 3000);
     await dismissConsentDialog(page);
 
@@ -67,12 +68,6 @@ export async function scrapeFlights(url) {
   } finally {
     await context.close();
   }
-}
-
-// Build a direct Google Flights results URL using the simpler /search path
-function buildDirectFlightsUrl(destination, rawDate) {
-  const q = encodeURIComponent(`Flights from Austin to ${destination} on ${rawDate}`);
-  return `https://www.google.com/travel/flights?q=${q}`;
 }
 
 async function waitForResults(page, interceptedFlightsRef, timeout = 45000) {
