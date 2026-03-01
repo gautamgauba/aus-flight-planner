@@ -56,53 +56,106 @@ async function setOneWayTrip(page) {
 async function fillSearchForm(page, url) {
   const urlObj = new URL(url);
   const query = decodeURIComponent(urlObj.searchParams.get('q') || '');
-  const destination = query.match(/to (\S+) on/)?.[1] || '';
+  // Match everything between "to " and " on YYYY-MM-DD" to support multi-word destinations
+  const destination = query.match(/to (.+?) on \d{4}/)?.[1]?.trim() || '';
   const rawDate = query.match(/on (\d{4}-\d{2}-\d{2})/)?.[1] || '';
   const date = rawDate ? formatDateForGoogle(rawDate) : '';
 
-  // Fill origin
+  console.log(`[Scraper] Searching: AUS -> ${destination} on ${date}`);
+
+  // Clear and fill origin field
   const fromInput = page.locator(SELECTORS.fromInput).first();
   await fromInput.click({ timeout: 10000 });
-  await fromInput.selectText();
-  await page.keyboard.type('Austin', { delay: 80 });
-  await randomDelay(800, 1200);
+  // Triple-click to select all existing text then replace
+  await fromInput.click({ clickCount: 3 });
+  await page.keyboard.type('Austin TX', { delay: 60 });
+  await randomDelay(1000, 1500);
 
-  const austinOption = page.locator('li[role="option"]').filter({ hasText: /Austin.*AUS/i }).first();
-  if (await austinOption.isVisible({ timeout: 5000 })) {
+  // Pick Austin from autocomplete
+  try {
+    const austinOption = page.locator('li[role="option"]').filter({ hasText: /Austin/i }).first();
+    await austinOption.waitFor({ state: 'visible', timeout: 6000 });
     await austinOption.click();
-  } else {
+  } catch {
     await page.keyboard.press('Enter');
   }
-  await randomDelay(500, 1000);
+  await randomDelay(600, 1000);
 
-  // Fill destination
-  const toInput = page.locator(SELECTORS.toInput).first();
-  await toInput.click({ timeout: 10000 });
-  await page.keyboard.type(destination, { delay: 80 });
-  await randomDelay(800, 1200);
+  // After selecting origin, focus usually moves to the "Where to?" field automatically.
+  // Try clicking it explicitly with multiple selector fallbacks.
+  let toFocused = false;
+  for (const selector of [
+    SELECTORS.toInput,
+    'input[placeholder*="Where to"]',
+    'input[aria-label*="Destination"]',
+    'input[aria-label*="where to"]',
+  ]) {
+    try {
+      const el = page.locator(selector).first();
+      if (await el.isVisible({ timeout: 3000 })) {
+        await el.click({ timeout: 5000 });
+        toFocused = true;
+        break;
+      }
+    } catch { /* try next */ }
+  }
 
-  const destOption = page.locator('li[role="option"]').first();
-  if (await destOption.isVisible({ timeout: 5000 })) {
+  if (!toFocused) {
+    // Fallback: tab from origin field to destination
+    await page.keyboard.press('Tab');
+    await randomDelay(300, 500);
+  }
+
+  await page.keyboard.type(destination, { delay: 70 });
+  await randomDelay(1000, 1500);
+
+  // Pick first autocomplete suggestion for destination
+  try {
+    const destOption = page.locator('li[role="option"]').first();
+    await destOption.waitFor({ state: 'visible', timeout: 6000 });
     await destOption.click();
-  } else {
+  } catch {
     await page.keyboard.press('Enter');
   }
-  await randomDelay(500, 1000);
+  await randomDelay(600, 1000);
 
-  // Fill date
+  // Fill departure date
   if (date) {
-    const dateInput = page.locator(SELECTORS.departureDateInput).first();
-    await dateInput.click({ timeout: 10000 });
-    await dateInput.fill('');
-    await page.keyboard.type(date, { delay: 60 });
-    await randomDelay(400, 800);
-    await page.keyboard.press('Enter');
-    await randomDelay(300, 600);
+    for (const selector of [
+      SELECTORS.departureDateInput,
+      'input[aria-label*="Departure"]',
+      'input[aria-label*="departure"]',
+      'input[placeholder*="Departure"]',
+    ]) {
+      try {
+        const el = page.locator(selector).first();
+        if (await el.isVisible({ timeout: 3000 })) {
+          await el.click({ timeout: 5000 });
+          await el.click({ clickCount: 3 });
+          await page.keyboard.type(date, { delay: 60 });
+          await randomDelay(400, 700);
+          await page.keyboard.press('Enter');
+          await randomDelay(300, 500);
+          break;
+        }
+      } catch { /* try next */ }
+    }
   }
 
-  // Submit search
-  const searchBtn = page.locator(SELECTORS.searchButton).first();
-  await searchBtn.click({ timeout: 10000 });
+  // Click Search button
+  for (const selector of [
+    SELECTORS.searchButton,
+    'button[aria-label*="Search"]',
+    'button:has-text("Search")',
+  ]) {
+    try {
+      const btn = page.locator(selector).first();
+      if (await btn.isVisible({ timeout: 3000 })) {
+        await btn.click({ timeout: 8000 });
+        break;
+      }
+    } catch { /* try next */ }
+  }
 }
 
 async function waitForAndExtractResults(page) {
